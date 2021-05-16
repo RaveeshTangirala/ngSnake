@@ -6,11 +6,13 @@ import { GridBoardComponent } from './grid-board/grid-board.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatButtonModule } from '@angular/material/button';
+import { PlayAgainButtonComponent } from './play-again-button/play-again-button.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GridBoardComponent
+    GridBoardComponent,
+    PlayAgainButtonComponent
   ],
   imports: [
     BrowserModule,

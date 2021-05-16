@@ -7,7 +7,7 @@ import { ArrowKeys } from '../arrow-keys';
   styleUrls: ['./grid-board.component.scss'],
   host: {
     '(document:keypress)': 'handleKeyboardEvent($event)',
-  },
+  }
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
   readonly boardWidth: number = 40;
@@ -159,8 +159,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   private moveSnakeBody(newHeadPosition: number): void {
-    this.snakeBody.unshift(newHeadPosition);
-    this.snakeBody.pop();
+    if (!this.isGameOver) {
+      this.snakeBody.unshift(newHeadPosition);
+      this.snakeBody.pop();
+    }
   }
 
   private updateFoodFosition(): void {
