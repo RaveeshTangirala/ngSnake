@@ -1,6 +1,6 @@
 <div class="col-8" *ngIf="!isGameOver; else gameOver">
   <div>Score: {{ score }}</div>
-  <mat-grid-list [cols]="boardWidth" style="background-color: black;">
+  <mat-grid-list [cols]="boardWidth">
     <mat-grid-tile
       *ngFor="let grid of boardHeightArr; let i = index"
       [style.background-color]="getGridColor(i)"

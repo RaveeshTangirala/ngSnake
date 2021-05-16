@@ -11,7 +11,7 @@ import { ArrowKeys } from '../arrow-keys';
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
   readonly boardWidth: number = 40;
-  readonly lastCellNumber = (this.boardWidth - 1) % 10;
+  readonly lastCellNumberOfRow = (this.boardWidth - 1) % 10;
   readonly boardHeight: number = this.boardWidth * 30;
   readonly minimum: number = 0;
   readonly maximum: number = this.boardHeight - 1;
@@ -99,10 +99,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private createInterval(): void {
     clearInterval(this.timeInterval);
     this.updateFoodFosition();
-    let newHeadPosition = this.getUpdatedSnakeHeadPosition();
+    let newHeadPosition = this.getNewSnakeHeadPosition();
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
+
     this.timeInterval = setInterval(() => {
       this.createInterval();
     }, this.snakeSpeed);
@@ -129,14 +130,14 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     // snake wall collision
     if (
       newHeadPosition < 0 || newHeadPosition >= this.boardHeight ||
-      (this.snakeBody[0] % this.boardWidth === 0 && newHeadPosition % 10 === this.lastCellNumber) ||
-      (this.snakeBody[0] % 10 === this.lastCellNumber && newHeadPosition % this.boardWidth === 0)
+      (this.snakeBody[0] % this.boardWidth === 0 && newHeadPosition % 10 === this.lastCellNumberOfRow) ||
+      (this.snakeBody[0] % 10 === this.lastCellNumberOfRow && newHeadPosition % this.boardWidth === 0)
     ) {
       this.gameOver();
     }
   }
 
-  private getUpdatedSnakeHeadPosition(): number {
+  private getNewSnakeHeadPosition(): number {
     let newHeadPosition = this.snakeBody[0];
 
     switch (this.key) {
