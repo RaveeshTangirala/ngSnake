@@ -1,0 +1,14 @@
+<div class="col-8" *ngIf="!isGameOver; else gameOver">
+  <div>Score: {{ score }}</div>
+  <mat-grid-list [cols]="boardWidth" style="background-color: black;">
+    <mat-grid-tile
+      *ngFor="let grid of boardHeightArr; let i = index"
+      [style.background-color]="getGridColor(i)"
+    ></mat-grid-tile>
+  </mat-grid-list>
+</div>
+
+<ng-template #gameOver>
+  <p>Game over! Your score is {{ score }}</p>
+  <button mat-button color="primary" (click)="playAgain()">Play Again?</button>
+</ng-template>
