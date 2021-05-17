@@ -98,7 +98,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private createInterval(): void {
     clearInterval(this.timeInterval);
-    this.updateFoodFosition();
+    this.updateFoodPosition();
     let newHeadPosition = this.getNewSnakeHeadPosition();
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
@@ -165,7 +165,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateFoodFosition(): void {
+  private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
       this.foodPosition = this.getRandomNumber();
     }
