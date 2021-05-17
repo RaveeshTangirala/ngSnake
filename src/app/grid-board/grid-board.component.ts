@@ -120,7 +120,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private handleSnakeCollision(newHeadPosition: number): void {
     // snake body collision
-    for (let i = 0; i < this.snakeBody.length; i++) {
+    for (let i = 3; i < this.snakeBody.length; i++) {
       if (newHeadPosition === this.snakeBody[i]) {
         this.gameOver();
         break;
