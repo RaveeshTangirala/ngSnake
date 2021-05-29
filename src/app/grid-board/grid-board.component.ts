@@ -112,7 +112,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private updateSnakeSpeed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
       this.snakeBody.unshift(this.foodPosition);
-      this.snakeSpeed -= this.snakeSpeed > 50 ? 50 : 0;
+      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
       this.foodPosition = -1;
       this.score++;
     }
