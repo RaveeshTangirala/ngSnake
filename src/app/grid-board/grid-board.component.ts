@@ -13,8 +13,6 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   readonly boardWidth: number = 40;
   readonly lastCellNumberOfRow = (this.boardWidth - 1) % 10;
   readonly boardHeight: number = this.boardWidth * 30;
-  readonly minimum: number = 0;
-  readonly maximum: number = this.boardHeight - 1;
 
   score: number = 0;
   isGameOver: boolean = false;
@@ -23,6 +21,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   snakeSpeed: number = 500;
   foodPosition: number = 780;
   timeInterval: any;
+  freeBlocks: Array<number> = new Array<number>();
   boardHeightArr = new Array(this.boardHeight);
 
   constructor() {}
@@ -44,6 +43,9 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     }
     else if (this.foodPosition === index) {
       gridColour = 'red';
+    }
+    else {
+      this.freeBlocks.push(index);
     }
 
     return gridColour;
@@ -103,6 +105,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
+    this.freeBlocks = [];
 
     this.timeInterval = setInterval(() => {
       this.createInterval();
@@ -167,11 +170,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
-      this.foodPosition = this.getRandomNumber();
+      this.foodPosition = this.freeBlocks[this.getRandomNumber()];
     }
   }
 
   private getRandomNumber(): number {
-    return Math.floor(Math.random() * (this.maximum - this.minimum + 1)) + this.minimum;
+    return Math.floor(Math.random() * this.freeBlocks.length);
   }
 }
