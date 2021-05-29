@@ -82,7 +82,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   playAgain(): void {
     this.isGameOver = false;
-    this.snakeSpeed = 500;
+    this.snakeSpeed = 400;
     this.foodPosition = 780;
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
