@@ -26,6 +26,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   timeIntervalId: any;
   freeBlocks: Array<number> = new Array<number>();
   boardMaxCellsArr = new Array(this.boardMaxCells);
+  level: number = 0;
 
   routeSubscription: Subscription = new Subscription();
 
@@ -33,6 +34,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.routeSubscription = this.route.params.subscribe(params => {
+      this.level = params['id'];
       import('../walls/wall_' + params['id'] + '.json').then((x: Array<number>) =>
         this.walls = JSON.parse(JSON.stringify(x)).default
       );

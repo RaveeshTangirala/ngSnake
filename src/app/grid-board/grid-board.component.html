@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-8">
       <ng-container *ngIf="!isGameOver; else gameOver">
+        <h3>Selected level: {{ level }}</h3>
         <p>
           Score: {{ score }}
           <play-again-button buttonText="Restart" (buttonClickEvent)="playAgain()"></play-again-button>
