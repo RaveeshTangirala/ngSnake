@@ -89,6 +89,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
+    this.createInterval();
   }
 
   private setUpSnake(): void {
@@ -109,6 +110,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
     this.timeInterval = setInterval(() => {
       this.createInterval();
+      if (this.isGameOver)
+        clearInterval(this.timeInterval);
     }, this.snakeSpeed);
   }
 
