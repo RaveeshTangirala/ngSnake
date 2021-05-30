@@ -7,7 +7,7 @@
           Score: {{ score }}
           <play-again-button buttonText="Restart" (buttonClickEvent)="playAgain()"></play-again-button>
         </p>
-        <a routerLink="">Choose level</a>
+        <choose-level></choose-level>
       </ng-container>
     </div>
   </div>
@@ -24,5 +24,5 @@
     Game over! Your score is {{ score }}!
     <play-again-button (buttonClickEvent)="playAgain()"></play-again-button>
   </p>
-  <a routerLink="">Choose level</a>
+  <choose-level></choose-level>
 </ng-template>

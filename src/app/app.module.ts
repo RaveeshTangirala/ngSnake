@@ -10,13 +10,17 @@ import { PlayAgainButtonComponent } from './play-again-button/play-again-button.
 import { AppRoutingModule } from './app-routing.module';
 import { LevelSelectorComponent } from './level-selector/level-selector.component';
 import { MatListModule } from '@angular/material/list';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { ChooseLevelComponent } from './choose-level/choose-level.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LevelSelectorComponent,
     GridBoardComponent,
-    PlayAgainButtonComponent
+    PlayAgainButtonComponent,
+    PageNotFoundComponent,
+    ChooseLevelComponent
   ],
   imports: [
     BrowserModule,
