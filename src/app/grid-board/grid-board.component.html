@@ -1,19 +1,27 @@
 <div class="col-8">
-  <div class="col-4">
-    <ng-container *ngIf="!isGameOver; else gameOver">
-      <p>Score: {{ score }}</p>
-      <play-again-button buttonText="Restart" (buttonClickEvent)="playAgain()"></play-again-button>
-    </ng-container>
+  <div class="row">
+    <div class="col-8">
+      <ng-container *ngIf="!isGameOver; else gameOver">
+        <p>
+          Score: {{ score }}
+          <play-again-button buttonText="Restart" (buttonClickEvent)="playAgain()"></play-again-button>
+        </p>
+        <a routerLink="">Choose level</a>
+      </ng-container>
+    </div>
   </div>
   <mat-grid-list [cols]="boardWidth">
     <mat-grid-tile
-      *ngFor="let grid of boardHeightArr; let i = index"
+      *ngFor="let grid of boardMaxCellsArr; let i = index"
       [style.background-color]="getGridColor(i)"
     ></mat-grid-tile>
   </mat-grid-list>
 </div>
 
 <ng-template #gameOver>
-  <p>Game over! Your score is {{ score }}!</p>
-  <play-again-button (buttonClickEvent)="playAgain()"></play-again-button>
+  <p>
+    Game over! Your score is {{ score }}!
+    <play-again-button (buttonClickEvent)="playAgain()"></play-again-button>
+  </p>
+  <a routerLink="">Choose level</a>
 </ng-template>

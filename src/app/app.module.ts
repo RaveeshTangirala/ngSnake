@@ -7,10 +7,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatButtonModule } from '@angular/material/button';
 import { PlayAgainButtonComponent } from './play-again-button/play-again-button.component';
+import { AppRoutingModule } from './app-routing.module';
+import { LevelSelectorComponent } from './level-selector/level-selector.component';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   declarations: [
     AppComponent,
+    LevelSelectorComponent,
     GridBoardComponent,
     PlayAgainButtonComponent
   ],
@@ -19,7 +23,9 @@ import { PlayAgainButtonComponent } from './play-again-button/play-again-button.
     BrowserAnimationsModule,
     MatGridListModule,
     NgbModule,
-    MatButtonModule
+    MatButtonModule,
+    AppRoutingModule,
+    MatListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,4 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ArrowKeys } from '../arrow-keys';
 
 @Component({
@@ -11,28 +13,37 @@ import { ArrowKeys } from '../arrow-keys';
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
   readonly boardWidth: number = 40;
-  readonly lastCellNumberOfRow = (this.boardWidth - 1) % 10;
-  readonly boardHeight: number = this.boardWidth * 30;
+  readonly boardHeight: number = 30;
+  readonly boardMaxCells: number = this.boardWidth * this.boardHeight;
 
   score: number = 0;
   isGameOver: boolean = false;
+  walls: Array<number> = new Array<number>();
   snakeBody: Array<number> = new Array<number>();
   key: ArrowKeys = ArrowKeys.ArrowLeft;
   snakeSpeed: number = 500;
   foodPosition: number = 780;
-  timeInterval: any;
+  timeIntervalId: any;
   freeBlocks: Array<number> = new Array<number>();
-  boardHeightArr = new Array(this.boardHeight);
+  boardMaxCellsArr = new Array(this.boardMaxCells);
 
-  constructor() {}
+  routeSubscription: Subscription = new Subscription();
+
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    this.routeSubscription = this.route.params.subscribe(params => {
+      import('../walls/wall_' + params['id'] + '.json').then((x: Array<number>) =>
+        this.walls = JSON.parse(JSON.stringify(x)).default
+      );
+    });
     this.setUpSnake();
     this.createInterval();
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.timeInterval);
+    this.routeSubscription.unsubscribe();
+    clearInterval(this.timeIntervalId);
   }
 
   getGridColor(index: number): string {
@@ -43,6 +54,9 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     }
     else if (this.foodPosition === index) {
       gridColour = 'red';
+    }
+    else if (this.walls.includes(index)) {
+      gridColour = 'white';
     }
     else {
       this.freeBlocks.push(index);
@@ -79,7 +93,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   gameOver(): void {
     this.isGameOver = true;
-    clearInterval(this.timeInterval);
+    clearInterval(this.timeIntervalId);
   }
 
   playAgain(): void {
@@ -100,7 +114,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   private createInterval(): void {
-    clearInterval(this.timeInterval);
+    clearInterval(this.timeIntervalId);
     this.updateFoodPosition();
     let newHeadPosition = this.getNewSnakeHeadPosition();
     this.handleSnakeCollision(newHeadPosition);
@@ -108,10 +122,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.updateSnakeSpeed();
     this.freeBlocks = [];
 
-    this.timeInterval = setInterval(() => {
+    this.timeIntervalId = setInterval(() => {
       this.createInterval();
       if (this.isGameOver)
-        clearInterval(this.timeInterval);
+        clearInterval(this.timeIntervalId);
     }, this.snakeSpeed);
   }
 
@@ -125,21 +139,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   private handleSnakeCollision(newHeadPosition: number): void {
-    // snake body collision
     for (let i = 3; i < this.snakeBody.length; i++) {
-      if (newHeadPosition === this.snakeBody[i]) {
+      if (newHeadPosition === this.snakeBody[i] || this.walls.includes(newHeadPosition)) {
         this.gameOver();
         break;
       }
-    }
-
-    // snake wall collision
-    if (
-      newHeadPosition < 0 || newHeadPosition >= this.boardHeight ||
-      (this.snakeBody[0] % this.boardWidth === 0 && newHeadPosition % 10 === this.lastCellNumberOfRow) ||
-      (this.snakeBody[0] % 10 === this.lastCellNumberOfRow && newHeadPosition % this.boardWidth === 0)
-    ) {
-      this.gameOver();
     }
   }
 
@@ -149,15 +153,23 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     switch (this.key) {
       case ArrowKeys.ArrowUp:
         newHeadPosition -= this.boardWidth;
+        if (newHeadPosition < 0)
+          newHeadPosition += this.boardMaxCells;
         break;
       case ArrowKeys.ArrowDown:
         newHeadPosition += this.boardWidth;
+        if (newHeadPosition > 1199)
+          newHeadPosition -= this.boardMaxCells;
         break;
       case ArrowKeys.ArrowLeft:
         newHeadPosition -= 1;
+        if ((newHeadPosition + 1) % this.boardWidth === 0)
+          newHeadPosition += this.boardWidth;
         break;
       case ArrowKeys.ArrowRight:
         newHeadPosition += 1;
+        if (newHeadPosition % this.boardWidth === 0)
+          newHeadPosition -= this.boardWidth;
         break;
     }
 
