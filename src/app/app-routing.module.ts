@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GridBoardComponent } from './grid-board/grid-board.component';
-import { GridBoardGuard } from './grid-board/grid-board.guard';
+import { GridBoardComponent } from './snake-board/grid-board/grid-board.component';
+import { GridBoardGuard } from './snake-board/grid-board.guard';
 import { LevelSelectorComponent } from './level-selector/level-selector.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 

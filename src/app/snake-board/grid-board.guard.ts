@@ -11,7 +11,7 @@ export class GridBoardGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return import('../walls/wall_' + route.params['id'] + '.json')
+    return import('../walls-data/wall_' + route.params['id'] + '.json')
       .then((x: Array<number>) => {
         return true;
       })
