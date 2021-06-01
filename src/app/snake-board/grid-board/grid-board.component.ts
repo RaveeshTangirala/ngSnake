@@ -1,7 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { ArrowKeys } from '../../arrow-keys-enum/arrow-keys';
+import { WallsDataService } from '../services/walls-data.service';
 
 @Component({
   selector: 'grid-board',
@@ -28,23 +27,15 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   boardMaxCellsArr = new Array(this.boardMaxCells);
   level: number = 0;
 
-  routeSubscription: Subscription = new Subscription();
-
-  constructor(private route: ActivatedRoute) {}
+  constructor(private wallsService: WallsDataService) {}
 
   ngOnInit(): void {
-    this.routeSubscription = this.route.params.subscribe(params => {
-      this.level = params['id'];
-      import('../../walls-data/wall_' + params['id'] + '.json').then((x: Array<number>) =>
-        this.walls = JSON.parse(JSON.stringify(x)).default
-      );
-    });
+    this.walls = this.wallsService.walls;
     this.setUpSnake();
     this.createInterval();
   }
 
   ngOnDestroy(): void {
-    this.routeSubscription.unsubscribe();
     clearInterval(this.timeIntervalId);
   }
 
