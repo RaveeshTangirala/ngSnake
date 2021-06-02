@@ -20,7 +20,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   walls: Array<number> = new Array<number>();
   snakeBody: Array<number> = new Array<number>();
   key: ArrowKeys = ArrowKeys.ArrowLeft;
-  snakeSpeed: number = 500;
+  snakeSpeed: number = 250;
   foodPosition: number = 780;
   timeIntervalId: any;
   freeBlocks: Array<number> = new Array<number>();
@@ -91,7 +91,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   playAgain(): void {
     this.isGameOver = false;
-    this.snakeSpeed = 400;
+    this.snakeSpeed = 250;
     this.foodPosition = 780;
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
@@ -125,7 +125,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private updateSnakeSpeed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
       this.snakeBody.unshift(this.foodPosition);
-      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
+      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.9 : 1;
       this.foodPosition = -1;
       this.score++;
     }
@@ -157,7 +157,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
         break;
       case ArrowKeys.ArrowDown:
         newHeadPosition += this.boardWidth;
-        if (newHeadPosition > 1199)
+        if (newHeadPosition > (this.boardMaxCells - 1))
           newHeadPosition -= this.boardMaxCells;
         break;
       case ArrowKeys.ArrowLeft:
