@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ArrowKeys } from '../../arrow-keys-enum/arrow-keys';
 import { WallsDataService } from '../services/walls-data.service';
 
@@ -8,7 +8,8 @@ import { WallsDataService } from '../services/walls-data.service';
   styleUrls: ['./grid-board.component.scss'],
   host: {
     '(document:keypress)': 'handleKeyboardEvent($event)',
-  }
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
   readonly boardWidth: number = 40;
@@ -27,7 +28,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   boardMaxCellsArr = new Array(this.boardMaxCells);
   level: number = 0;
 
-  constructor(private wallsService: WallsDataService) {}
+  constructor(
+    private wallsService: WallsDataService,
+    private ref: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.walls = this.wallsService.walls;
@@ -96,6 +100,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
+    this.freeBlocks = [];
     this.createInterval();
   }
 
@@ -114,6 +119,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
     this.freeBlocks = [];
+    this.ref.detectChanges();
 
     this.timeIntervalId = setInterval(() => {
       this.createInterval();
@@ -125,7 +131,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private updateSnakeSpeed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
       this.snakeBody.unshift(this.foodPosition);
-      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.9 : 1;
+      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.85 : 1;
       this.foodPosition = -1;
       this.score++;
     }
