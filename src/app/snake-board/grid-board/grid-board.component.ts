@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ArrowKeys } from '../../arrow-keys-enum/arrow-keys';
 import { WallsDataService } from '../services/walls-data.service';
 
@@ -26,9 +27,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   timeIntervalId: any;
   freeBlocks: Array<number> = new Array<number>();
   boardMaxCellsArr = new Array(this.boardMaxCells);
-  level: number = 0;
+  level: string = this.route.snapshot.paramMap.get('id') ?? '';
 
   constructor(
+    private route: ActivatedRoute,
     private wallsService: WallsDataService,
     private ref: ChangeDetectorRef
   ) {}
