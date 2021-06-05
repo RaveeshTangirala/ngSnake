@@ -22,6 +22,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   walls: Array<number> = new Array<number>();
   snakeBody: Array<number> = new Array<number>();
   key: ArrowKeys = ArrowKeys.ArrowLeft;
+  keys: Array<ArrowKeys> = new Array<ArrowKeys>();
   snakeSpeed: number = 250;
   foodPosition: number = 780;
   timeIntervalId: any;
@@ -66,26 +67,34 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
+    if (this.keys.length === 2) {
+      return;
+    }
+
     switch (event.key) {
       case 'ArrowUp':
         if (this.key === ArrowKeys.ArrowDown)
           return;
         this.key = ArrowKeys.ArrowUp;
+        this.keys.push(ArrowKeys.ArrowUp);
         break;
       case 'ArrowDown':
         if (this.key === ArrowKeys.ArrowUp)
           return;
         this.key = ArrowKeys.ArrowDown;
+        this.keys.push(ArrowKeys.ArrowDown);
         break;
       case 'ArrowLeft':
         if (this.key === ArrowKeys.ArrowRight)
           return;
         this.key = ArrowKeys.ArrowLeft;
+        this.keys.push(ArrowKeys.ArrowLeft);
         break;
       case 'ArrowRight':
         if (this.key === ArrowKeys.ArrowLeft)
           return;
         this.key = ArrowKeys.ArrowRight;
+        this.keys.push(ArrowKeys.ArrowRight);
         break;
     }
   }
@@ -121,6 +130,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
     this.freeBlocks = [];
+    this.keys = [];
     this.ref.detectChanges();
 
     this.timeIntervalId = setInterval(() => {
@@ -156,8 +166,9 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private getNewSnakeHeadPosition(): number {
     let newHeadPosition = this.snakeBody[0];
+    let firstKey: ArrowKeys = this.keys.length > 0 ? this.keys[0] : this.key;
 
-    switch (this.key) {
+    switch (firstKey) {
       case ArrowKeys.ArrowUp:
         newHeadPosition -= this.boardWidth;
         if (newHeadPosition < 0)
