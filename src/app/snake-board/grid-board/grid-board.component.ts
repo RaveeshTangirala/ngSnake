@@ -65,6 +65,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     return gridColour;
   }
 
+  trackByGrid(index: number, colour: string) {
+    return index;
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     if (this.keys.length === 2) {
@@ -143,7 +147,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private updateSnakeSpeed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
       this.snakeBody.unshift(this.foodPosition);
-      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.85 : 1;
+      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
       this.foodPosition = -1;
       this.score++;
     }
