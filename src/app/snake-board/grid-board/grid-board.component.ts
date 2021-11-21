@@ -19,16 +19,19 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   score: number = 0;
   isGameOver: boolean = false;
-  walls: Array<number> = new Array<number>();
+
+  walls!: Set<number>;
   snakeBody: Array<number> = new Array<number>();
+  freeBlocks: Set<number> = new Set<number>();
+  boardMaxCellsArr = new Array(this.boardMaxCells);
+
   key: ArrowKeys = ArrowKeys.ArrowLeft;
   keys: Array<ArrowKeys> = new Array<ArrowKeys>();
+
   snakeSpeed: number = 250;
   foodPosition: number = 780;
-  timeIntervalId: any;
-  freeBlocks: Array<number> = new Array<number>();
-  boardMaxCellsArr = new Array(this.boardMaxCells);
   level: string = this.route.snapshot.paramMap.get('id') ?? '';
+  timeIntervalId: NodeJS.Timer;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,7 +40,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.walls = this.wallsService.walls;
+    this.walls = new Set<number>(this.wallsService.walls);
     this.setUpSnake();
     this.createInterval();
   }
@@ -49,17 +52,17 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   getGridColor(index: number): string {
     let gridColour = 'black';
 
-    if (this.snakeBody.includes(index)) {
-      gridColour = 'green';
-    }
-    else if (this.foodPosition === index) {
+    if (this.foodPosition === index) {
       gridColour = 'red';
     }
-    else if (this.walls.includes(index)) {
+    else if (this.walls.has(index)) {
       gridColour = 'white';
     }
+    else if (this.snakeBody.includes(index)) {
+      gridColour = 'green';
+    }
     else {
-      this.freeBlocks.push(index);
+      this.freeBlocks.add(index);
     }
 
     return gridColour;
@@ -115,7 +118,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
-    this.freeBlocks = [];
+    this.freeBlocks.clear();
     this.createInterval();
   }
 
@@ -133,7 +136,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
-    this.freeBlocks = [];
+    this.freeBlocks.clear();
     this.keys = [];
     this.ref.detectChanges();
 
@@ -158,12 +161,12 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     for (let i = 2; i < this.snakeBody.length; i++) {
       if (newHeadPosition === this.snakeBody[i]) {
         this.gameOver();
-        break;
+        return;
       }
     }
 
     // snake collides with wall
-    if (this.walls.includes(newHeadPosition)) {
+    if (this.walls.has(newHeadPosition)) {
       this.gameOver();
     }
   }
@@ -207,11 +210,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
-      this.foodPosition = this.freeBlocks[this.getRandomNumber()];
+      this.foodPosition = [...this.freeBlocks][this.getRandomNumber()];
     }
   }
 
   private getRandomNumber(): number {
-    return Math.floor(Math.random() * this.freeBlocks.length);
+    return Math.floor(Math.random() * this.freeBlocks.size);
   }
 }
