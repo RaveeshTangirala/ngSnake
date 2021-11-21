@@ -34,7 +34,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private wallsService: WallsDataService,
     private ref: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.walls = this.wallsService.walls;

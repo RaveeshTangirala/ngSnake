@@ -1,1 +1,0 @@
-(self.webpackChunkng_snake=self.webpackChunkng_snake||[]).push([[189],{189:e=>{"use strict";e.exports=[]}}]);
