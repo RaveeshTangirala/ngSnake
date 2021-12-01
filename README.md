@@ -1,4 +1,4 @@
-# Snake
+# ngSnake
 
 Visit the page here https://raveeshtangirala.github.io/ngSnake/
 
