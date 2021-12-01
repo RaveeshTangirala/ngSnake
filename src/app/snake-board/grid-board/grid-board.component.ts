@@ -117,8 +117,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.snakeSpeed = 250;
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
-    this.setUpFood();
     this.setUpSnake();
+    this.setUpFood();
     this.createInterval();
   }
 
