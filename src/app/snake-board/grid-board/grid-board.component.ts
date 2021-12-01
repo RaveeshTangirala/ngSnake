@@ -3,6 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { ArrowKeys } from '../../arrow-keys-enum/arrow-keys';
 import { WallsDataService } from '../services/walls-data.service';
 
+export enum CellType {
+  Free,
+  Wall,
+  Body,
+  Food
+};
+
 @Component({
   selector: 'grid-board',
   templateUrl: './grid-board.component.html',
@@ -20,10 +27,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   score: number = 0;
   isGameOver: boolean = false;
 
-  walls!: Set<number>;
   snakeBody: Array<number> = new Array<number>();
-  freeBlocks: Set<number> = new Set<number>();
-  boardMaxCellsArr = new Array(this.boardMaxCells);
+  boardData: Array<CellType> = this.wallsService.boardData;
 
   key: ArrowKeys = ArrowKeys.ArrowLeft;
   keys: Array<ArrowKeys> = new Array<ArrowKeys>();
@@ -37,11 +42,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private wallsService: WallsDataService,
     private ref: ChangeDetectorRef
-  ) { }
+  ) {
+    this.setUpSnake();
+  }
 
   ngOnInit(): void {
-    this.walls = new Set<number>(this.wallsService.walls);
-    this.setUpSnake();
     this.createInterval();
   }
 
@@ -49,26 +54,22 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     clearInterval(this.timeIntervalId);
   }
 
-  getGridColor(index: number): string {
-    let gridColour = 'black';
-
-    if (this.foodPosition === index) {
-      gridColour = 'red';
+  getBoardColour(cellType: CellType): string {
+    switch (cellType) {
+      case CellType.Free:
+        return 'black';
+      case CellType.Wall:
+        return 'white';
+      case CellType.Body:
+        return 'green';
+      case CellType.Food:
+        return 'red';
+      default:
+        return '';
     }
-    else if (this.walls.has(index)) {
-      gridColour = 'white';
-    }
-    else if (this.snakeBody.includes(index)) {
-      gridColour = 'green';
-    }
-    else {
-      this.freeBlocks.add(index);
-    }
-
-    return gridColour;
   }
 
-  trackByGrid(index: number, colour: string) {
+  trackByGrid(index: number) {
     return index;
   }
 
@@ -114,19 +115,27 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   playAgain(): void {
     this.isGameOver = false;
     this.snakeSpeed = 250;
-    this.foodPosition = 780;
     this.score = 0;
     this.key = ArrowKeys.ArrowLeft;
+    this.setUpFood();
     this.setUpSnake();
-    this.freeBlocks.clear();
     this.createInterval();
   }
 
+  private setUpFood() {
+    this.boardData[this.foodPosition] = CellType.Free;
+    this.foodPosition = 780;
+    this.boardData[this.foodPosition] = CellType.Food;
+  }
+
   private setUpSnake(): void {
-    this.snakeBody = [];
-    this.snakeBody.push(825);
-    this.snakeBody.push(826);
-    this.snakeBody.push(827);
+    for (let position of this.snakeBody) {
+      this.boardData[position] = CellType.Free;
+    }
+    this.snakeBody = [825, 826, 827];
+    for (let position of this.snakeBody) {
+      this.boardData[position] = CellType.Body;
+    }
   }
 
   private createInterval(): void {
@@ -136,7 +145,6 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
-    this.freeBlocks.clear();
     this.keys = [];
     this.ref.detectChanges();
 
@@ -157,17 +165,11 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   private handleSnakeCollision(newHeadPosition: number): void {
-    // snake collides with its body
-    for (let i = 2; i < this.snakeBody.length; i++) {
-      if (newHeadPosition === this.snakeBody[i]) {
+    switch (this.boardData[newHeadPosition]) {
+      case CellType.Body:
+      case CellType.Wall:
         this.gameOver();
-        return;
-      }
-    }
-
-    // snake collides with wall
-    if (this.walls.has(newHeadPosition)) {
-      this.gameOver();
+        break;
     }
   }
 
@@ -204,17 +206,29 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private moveSnakeBody(newHeadPosition: number): void {
     if (!this.isGameOver) {
       this.snakeBody.unshift(newHeadPosition);
-      this.snakeBody.pop();
+      this.boardData[this.snakeBody.pop()!] = CellType.Free;
+
+      for (let i = 0; i < this.snakeBody.length; i++) {
+        this.boardData[this.snakeBody[i]] = CellType.Body;
+      }
     }
   }
 
   private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
-      this.foodPosition = [...this.freeBlocks][this.getRandomNumber()];
+      let freeBlocks = this.getFreeBlocks();
+      this.foodPosition = freeBlocks[Math.floor(Math.random() * freeBlocks.length)];
+      this.boardData[this.foodPosition] = CellType.Food;
     }
   }
 
-  private getRandomNumber(): number {
-    return Math.floor(Math.random() * this.freeBlocks.size);
+  private getFreeBlocks(): Array<number> {
+    let freeBlocks: Array<number> = [];
+    for (let i = 0; i < this.boardMaxCells; i++) {
+      if (this.boardData[i] === CellType.Free) {
+        freeBlocks.push(i);
+      }
+    }
+    return freeBlocks;
   }
 }

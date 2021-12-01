@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
+import { CellType } from '../grid-board/grid-board.component';
 import { WallsDataService } from './walls-data.service';
 
 @Injectable({
@@ -16,9 +17,9 @@ export class GridBoardGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return import('../../walls-data/wall_' + route.params['id'] + '.json')
-      .then((walls: Array<number>) => {
-        this.wallsDataService.walls = JSON.parse(JSON.stringify(walls)).default;
+    return import('../board-data/board-' + route.params['id'] + '.json')
+      .then((boardData: Array<CellType>) => {
+        this.wallsDataService.boardData = JSON.parse(JSON.stringify(boardData)).default;
         return true;
       })
       .catch((err) => {

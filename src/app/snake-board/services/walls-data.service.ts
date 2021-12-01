@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import { CellType } from '../grid-board/grid-board.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WallsDataService {
-  walls: Array<number> = new Array<number>();
+  boardData: Array<CellType> = new Array<CellType>();
 
   constructor() { }
 }
