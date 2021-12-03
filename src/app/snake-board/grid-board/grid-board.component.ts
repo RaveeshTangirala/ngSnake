@@ -1,14 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ArrowKeys } from '../../arrow-keys-enum/arrow-keys';
+import { ArrowKeys } from '../enums/arrow-keys';
+import { CellType } from '../enums/cell-types';
 import { WallsDataService } from '../services/walls-data.service';
-
-export enum CellType {
-  Free,
-  Wall,
-  Body,
-  Food
-};
 
 @Component({
   selector: 'grid-board',

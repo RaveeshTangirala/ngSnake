@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-import { CellType } from '../grid-board/grid-board.component';
+import { CellType } from '../enums/cell-types';
 import { WallsDataService } from './walls-data.service';
 
 @Injectable({

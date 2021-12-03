@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CellType } from '../grid-board/grid-board.component';
+import { CellType } from '../enums/cell-types';
 
 @Injectable({
   providedIn: 'root'
