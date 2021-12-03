@@ -20,24 +20,25 @@ export enum CellType {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
-  readonly boardWidth: number = 40;
-  readonly boardHeight: number = 30;
-  readonly boardMaxCells: number = this.boardWidth * this.boardHeight;
 
   score: number = 0;
   isGameOver: boolean = false;
 
-  snakeBody: Array<number> = new Array<number>();
   boardData: Array<CellType> = this.wallsService.boardData;
-
-  key: ArrowKeys = ArrowKeys.ArrowLeft;
-  keys: Array<ArrowKeys> = new Array<ArrowKeys>();
-
-  snakeSpeed: number = 250;
-  foodPosition: number = 780;
-  freeBlocks: Array<number> = [];
   level: string = this.route.snapshot.paramMap.get('id') ?? '';
-  timeIntervalId: NodeJS.Timer;
+
+  readonly boardWidth: number = 40;
+  private readonly boardHeight: number = 30;
+  private readonly boardMaxCells: number = this.boardWidth * this.boardHeight;
+
+  private key: ArrowKeys = ArrowKeys.ArrowLeft;
+  private keys: Array<ArrowKeys> = new Array<ArrowKeys>();
+  private snakeBody: Array<number> = new Array<number>();
+
+  private snakeSpeed: number = 250;
+  private foodPosition: number = 780;
+  private freeBlocks: Array<number> = [];
+  private timeIntervalId: NodeJS.Timer;
 
   constructor(
     private route: ActivatedRoute,
