@@ -35,6 +35,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   snakeSpeed: number = 250;
   foodPosition: number = 780;
+  freeBlocks: Array<number> = [];
   level: string = this.route.snapshot.paramMap.get('id') ?? '';
   timeIntervalId: NodeJS.Timer;
 
@@ -54,9 +55,10 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     clearInterval(this.timeIntervalId);
   }
 
-  getBoardColour(cellType: CellType): string {
+  getBoardColour(cellType: CellType, index: number): string {
     switch (cellType) {
       case CellType.Free:
+        this.freeBlocks.push(index);
         return 'black';
       case CellType.Wall:
         return 'white';
@@ -146,7 +148,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.moveSnakeBody(newHeadPosition);
     this.updateSnakeSpeed();
     this.keys = [];
-    this.ref.detectChanges();
+    this.freeBlocks = [];
+    this.ref.markForCheck();
 
     this.timeIntervalId = setInterval(() => {
       this.createInterval();
@@ -216,19 +219,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
-      let freeBlocks = this.getFreeBlocks();
-      this.foodPosition = freeBlocks[Math.floor(Math.random() * freeBlocks.length)];
+      this.foodPosition = this.freeBlocks[Math.floor(Math.random() * this.freeBlocks.length)];
       this.boardData[this.foodPosition] = CellType.Food;
     }
-  }
-
-  private getFreeBlocks(): Array<number> {
-    let freeBlocks: Array<number> = [];
-    for (let i = 0; i < this.boardMaxCells; i++) {
-      if (this.boardData[i] === CellType.Free) {
-        freeBlocks.push(i);
-      }
-    }
-    return freeBlocks;
   }
 }

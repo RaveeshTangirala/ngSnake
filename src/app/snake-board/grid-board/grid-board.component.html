@@ -13,8 +13,8 @@
   </div>
   <mat-grid-list [cols]="boardWidth">
     <mat-grid-tile
-      *ngFor="let cellType of boardData; trackBy: trackByGrid"
-      [style.background-color]="getBoardColour(cellType)"
+      *ngFor="let cellType of boardData;let i = index; trackBy: trackByGrid"
+      [style.background-color]="getBoardColour(cellType, i)"
     ></mat-grid-tile>
   </mat-grid-list>
 </div>
