@@ -16,7 +16,7 @@ import { WallsDataService } from '../services/walls-data.service';
 export class GridBoardComponent implements OnInit, OnDestroy {
 
   score: number = 0;
-  isGameOver: boolean = false;
+  isGameOver: boolean;
 
   boardData: Array<CellType> = this.wallsService.boardData;
   level: string = this.route.snapshot.paramMap.get('id') ?? '';
@@ -106,6 +106,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   gameOver(): void {
     this.isGameOver = true;
+    this.keys = [];
     clearInterval(this.timeIntervalId);
   }
 
@@ -113,6 +114,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.isGameOver = false;
     this.snakeSpeed = 250;
     this.score = 0;
+    this.keys = [];
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
     this.setUpFood();
