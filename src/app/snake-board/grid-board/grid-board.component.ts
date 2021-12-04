@@ -157,7 +157,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private updateDataWhenFoodIsConsumed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
-      this.snakeBody.unshift(this.foodPosition);
+      this.snakeBody.push(this.foodPosition);
       this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
       this.foodPosition = -1;
       this.score++;
@@ -205,8 +205,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private moveSnakeBody(newHeadPosition: number): void {
     if (!this.isGameOver) {
-      this.snakeBody.unshift(newHeadPosition);
       this.boardData[this.snakeBody.pop()!] = CellType.Free;
+      this.snakeBody.unshift(newHeadPosition);
 
       for (let i = 0; i < this.snakeBody.length; i++) {
         this.boardData[this.snakeBody[i]] = CellType.Body;
