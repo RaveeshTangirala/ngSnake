@@ -50,7 +50,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     clearInterval(this.timeIntervalId);
   }
 
-  getBoardColour(cellType: CellType, index: number): string {
+  getCellColour(cellType: CellType, index: number): string {
     switch (cellType) {
       case CellType.Free:
         this.freeBlocks.push(index);
@@ -143,7 +143,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     let newHeadPosition = this.getNewSnakeHeadPosition();
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
-    this.updateSnakeSpeed();
+    this.updateDataWhenFoodIsConsumed();
     this.keys = [];
     this.freeBlocks = [];
     this.ref.markForCheck();
@@ -155,7 +155,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     }, this.snakeSpeed);
   }
 
-  private updateSnakeSpeed(): void {
+  private updateDataWhenFoodIsConsumed(): void {
     if (this.snakeBody[0] === this.foodPosition) {
       this.snakeBody.unshift(this.foodPosition);
       this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
