@@ -26,7 +26,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private readonly boardMaxCells: number = this.boardWidth * this.boardHeight;
 
   private key: ArrowKeys = ArrowKeys.ArrowLeft;
-  private keys: Array<ArrowKeys> = new Array<ArrowKeys>();
+  private keyBuffer: Array<ArrowKeys> = new Array<ArrowKeys>();
   private snakeBody: Array<number> = new Array<number>();
 
   private snakeSpeed: number = 250;
@@ -72,7 +72,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    if (this.keys.length === 2) {
+    if (this.keyBuffer.length === 2) {
       return;
     }
 
@@ -81,32 +81,32 @@ export class GridBoardComponent implements OnInit, OnDestroy {
         if (this.key === ArrowKeys.ArrowDown)
           return;
         this.key = ArrowKeys.ArrowUp;
-        this.keys.push(ArrowKeys.ArrowUp);
+        this.keyBuffer.push(ArrowKeys.ArrowUp);
         break;
       case 'ArrowDown':
         if (this.key === ArrowKeys.ArrowUp)
           return;
         this.key = ArrowKeys.ArrowDown;
-        this.keys.push(ArrowKeys.ArrowDown);
+        this.keyBuffer.push(ArrowKeys.ArrowDown);
         break;
       case 'ArrowLeft':
         if (this.key === ArrowKeys.ArrowRight)
           return;
         this.key = ArrowKeys.ArrowLeft;
-        this.keys.push(ArrowKeys.ArrowLeft);
+        this.keyBuffer.push(ArrowKeys.ArrowLeft);
         break;
       case 'ArrowRight':
         if (this.key === ArrowKeys.ArrowLeft)
           return;
         this.key = ArrowKeys.ArrowRight;
-        this.keys.push(ArrowKeys.ArrowRight);
+        this.keyBuffer.push(ArrowKeys.ArrowRight);
         break;
     }
   }
 
   gameOver(): void {
     this.isGameOver = true;
-    this.keys = [];
+    this.keyBuffer = [];
     clearInterval(this.timeIntervalId);
   }
 
@@ -114,7 +114,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.isGameOver = false;
     this.snakeSpeed = 250;
     this.score = 0;
-    this.keys = [];
+    this.keyBuffer = [];
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
     this.setUpFood();
@@ -144,7 +144,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.handleSnakeCollision(newHeadPosition);
     this.moveSnakeBody(newHeadPosition);
     this.updateDataWhenFoodIsConsumed();
-    this.keys = [];
+    this.keyBuffer = [];
     this.freeBlocks = [];
     this.ref.markForCheck();
 
@@ -175,28 +175,24 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private getNewSnakeHeadPosition(): number {
     let newHeadPosition = this.snakeBody[0];
-    let firstKey: ArrowKeys = this.keys.length > 0 ? this.keys[0] : this.key;
+    let firstKey: ArrowKeys = this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
 
     switch (firstKey) {
       case ArrowKeys.ArrowUp:
         newHeadPosition -= this.boardWidth;
-        if (newHeadPosition < 0)
-          newHeadPosition += this.boardMaxCells;
+        newHeadPosition += newHeadPosition < 0 ? this.boardMaxCells : 0;
         break;
       case ArrowKeys.ArrowDown:
         newHeadPosition += this.boardWidth;
-        if (newHeadPosition > (this.boardMaxCells - 1))
-          newHeadPosition -= this.boardMaxCells;
+        newHeadPosition -= newHeadPosition > (this.boardMaxCells - 1) ? this.boardMaxCells : 0;
         break;
       case ArrowKeys.ArrowLeft:
         newHeadPosition -= 1;
-        if ((newHeadPosition + 1) % this.boardWidth === 0)
-          newHeadPosition += this.boardWidth;
+        newHeadPosition += (newHeadPosition + 1) % this.boardWidth === 0 ? this.boardWidth : 0;
         break;
       case ArrowKeys.ArrowRight:
         newHeadPosition += 1;
-        if (newHeadPosition % this.boardWidth === 0)
-          newHeadPosition -= this.boardWidth;
+        newHeadPosition -= newHeadPosition % this.boardWidth === 0 ? this.boardWidth : 0;
         break;
     }
 
