@@ -180,19 +180,23 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     switch (firstKey) {
       case ArrowKeys.ArrowUp:
         newHeadPosition -= this.boardWidth;
-        newHeadPosition += newHeadPosition < 0 ? this.boardMaxCells : 0;
+        if (newHeadPosition < 0)
+          newHeadPosition += this.boardMaxCells;
         break;
       case ArrowKeys.ArrowDown:
         newHeadPosition += this.boardWidth;
-        newHeadPosition -= newHeadPosition > (this.boardMaxCells - 1) ? this.boardMaxCells : 0;
+        if (newHeadPosition > (this.boardMaxCells - 1))
+          newHeadPosition -= this.boardMaxCells;
         break;
       case ArrowKeys.ArrowLeft:
         newHeadPosition -= 1;
-        newHeadPosition += (newHeadPosition + 1) % this.boardWidth === 0 ? this.boardWidth : 0;
+        if ((newHeadPosition + 1) % this.boardWidth === 0)
+          newHeadPosition += this.boardWidth;
         break;
       case ArrowKeys.ArrowRight:
         newHeadPosition += 1;
-        newHeadPosition -= newHeadPosition % this.boardWidth === 0 ? this.boardWidth : 0;
+        if (newHeadPosition % this.boardWidth === 0)
+          newHeadPosition -= this.boardWidth;
         break;
     }
 
