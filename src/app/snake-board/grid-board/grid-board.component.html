@@ -5,7 +5,10 @@
         <h3>Selected level: {{ level }}</h3>
         <p>
           Score: {{ score }}
-          <play-again-button buttonText="Restart" (buttonClickEvent)="playAgain()"></play-again-button>
+          <play-again-button
+            buttonText="Restart"
+            (buttonClickEvent)="playAgain()"
+          ></play-again-button>
         </p>
         <choose-level></choose-level>
       </ng-container>
@@ -13,7 +16,7 @@
   </div>
   <mat-grid-list [cols]="boardWidth">
     <mat-grid-tile
-      *ngFor="let cellType of boardData;let i = index; trackBy: trackByGrid"
+      *ngFor="let cellType of boardData; let i = index; trackBy: trackByGrid"
       [style.background-color]="getCellColour(cellType, i)"
     ></mat-grid-tile>
   </mat-grid-list>

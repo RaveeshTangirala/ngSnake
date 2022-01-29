@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ArrowKeys } from '../enums/arrow-keys';
 import { CellType } from '../enums/cell-types';
@@ -11,15 +18,14 @@ import { WallsDataService } from '../services/walls-data.service';
   host: {
     '(document:keypress)': 'handleKeyboardEvent($event)',
   },
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
-
   score: number = 0;
   isGameOver: boolean;
 
   boardData: Array<CellType> = this.wallsService.boardData;
-  level: string = this.route.snapshot.paramMap.get('id') ?? '';
+  level: string = this.route.snapshot.paramMap.get('id')!;
 
   readonly boardWidth: number = 40;
   private readonly boardHeight: number = 30;
@@ -32,7 +38,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   private snakeSpeed: number = 250;
   private foodPosition: number = 780;
   private freeBlocks: Array<number> = [];
-  private timeIntervalId: NodeJS.Timer;
+  private startTime: number;
+  private animationFrame: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,11 +50,14 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.createInterval();
+    this.startTime = Date.now();
+    this.animationFrame = window.requestAnimationFrame(() =>
+      this.createInterval()
+    );
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.timeIntervalId);
+    window.cancelAnimationFrame(this.animationFrame);
   }
 
   getCellColour(cellType: CellType, index: number): string {
@@ -78,26 +88,22 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
     switch (event.key) {
       case 'ArrowUp':
-        if (this.key === ArrowKeys.ArrowDown)
-          return;
+        if (this.key === ArrowKeys.ArrowDown) return;
         this.key = ArrowKeys.ArrowUp;
         this.keyBuffer.push(ArrowKeys.ArrowUp);
         break;
       case 'ArrowDown':
-        if (this.key === ArrowKeys.ArrowUp)
-          return;
+        if (this.key === ArrowKeys.ArrowUp) return;
         this.key = ArrowKeys.ArrowDown;
         this.keyBuffer.push(ArrowKeys.ArrowDown);
         break;
       case 'ArrowLeft':
-        if (this.key === ArrowKeys.ArrowRight)
-          return;
+        if (this.key === ArrowKeys.ArrowRight) return;
         this.key = ArrowKeys.ArrowLeft;
         this.keyBuffer.push(ArrowKeys.ArrowLeft);
         break;
       case 'ArrowRight':
-        if (this.key === ArrowKeys.ArrowLeft)
-          return;
+        if (this.key === ArrowKeys.ArrowLeft) return;
         this.key = ArrowKeys.ArrowRight;
         this.keyBuffer.push(ArrowKeys.ArrowRight);
         break;
@@ -107,7 +113,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   gameOver(): void {
     this.isGameOver = true;
     this.keyBuffer = [];
-    clearInterval(this.timeIntervalId);
+    window.cancelAnimationFrame(this.animationFrame);
   }
 
   playAgain(): void {
@@ -138,21 +144,21 @@ export class GridBoardComponent implements OnInit, OnDestroy {
   }
 
   private createInterval(): void {
-    clearInterval(this.timeIntervalId);
-    this.updateFoodPosition();
-    let newHeadPosition = this.getNewSnakeHeadPosition();
-    this.handleSnakeCollision(newHeadPosition);
-    this.moveSnakeBody(newHeadPosition);
-    this.updateDataWhenFoodIsConsumed();
-    this.keyBuffer = [];
-    this.freeBlocks = [];
-    this.ref.markForCheck();
+    if (Date.now() - this.startTime >= this.snakeSpeed) {
+      this.updateFoodPosition();
+      const newHeadPosition = this.getNewSnakeHeadPosition();
+      this.handleSnakeCollision(newHeadPosition);
+      this.moveSnakeBody(newHeadPosition);
+      this.updateDataWhenFoodIsConsumed();
+      this.keyBuffer = [];
+      this.freeBlocks = [];
+      this.ref.markForCheck();
+      this.startTime = Date.now();
+    }
 
-    this.timeIntervalId = setInterval(() => {
-      this.createInterval();
-      if (this.isGameOver)
-        clearInterval(this.timeIntervalId);
-    }, this.snakeSpeed);
+    this.animationFrame = window.requestAnimationFrame(() =>
+      this.createInterval()
+    );
   }
 
   private updateDataWhenFoodIsConsumed(): void {
@@ -175,17 +181,17 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private getNewSnakeHeadPosition(): number {
     let newHeadPosition = this.snakeBody[0];
-    let firstKey: ArrowKeys = this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
+    const firstKey: ArrowKeys =
+      this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
 
     switch (firstKey) {
       case ArrowKeys.ArrowUp:
         newHeadPosition -= this.boardWidth;
-        if (newHeadPosition < 0)
-          newHeadPosition += this.boardMaxCells;
+        if (newHeadPosition < 0) newHeadPosition += this.boardMaxCells;
         break;
       case ArrowKeys.ArrowDown:
         newHeadPosition += this.boardWidth;
-        if (newHeadPosition > (this.boardMaxCells - 1))
+        if (newHeadPosition > this.boardMaxCells - 1)
           newHeadPosition -= this.boardMaxCells;
         break;
       case ArrowKeys.ArrowLeft:
@@ -216,7 +222,8 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private updateFoodPosition(): void {
     if (this.foodPosition < 0) {
-      this.foodPosition = this.freeBlocks[Math.floor(Math.random() * this.freeBlocks.length)];
+      this.foodPosition =
+        this.freeBlocks[Math.floor(Math.random() * this.freeBlocks.length)];
       this.boardData[this.foodPosition] = CellType.Food;
     }
   }

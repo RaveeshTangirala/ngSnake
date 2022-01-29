@@ -7,18 +7,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { ChooseLevelModule } from '../choose-level/choose-level.module';
 
 @NgModule({
-  declarations: [
-    GridBoardComponent,
-    PlayAgainButtonComponent
-  ],
+  declarations: [GridBoardComponent, PlayAgainButtonComponent],
   imports: [
     CommonModule,
     MatGridListModule,
     MatButtonModule,
-    ChooseLevelModule
+    ChooseLevelModule,
   ],
-  exports: [
-    GridBoardComponent
-  ]
+  exports: [GridBoardComponent],
 })
-export class SnakeBoardModule { }
+export class SnakeBoardModule {}
