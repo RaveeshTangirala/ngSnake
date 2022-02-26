@@ -1,15 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'level-selector',
-  templateUrl: './level-selector.component.html',
-  styleUrls: ['./level-selector.component.scss']
+	selector: 'level-selector',
+	templateUrl: './level-selector.component.html',
+	styleUrls: ['./level-selector.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LevelSelectorComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+export class LevelSelectorComponent {
+	constructor() {}
 }

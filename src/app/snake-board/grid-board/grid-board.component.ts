@@ -76,7 +76,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackByGrid(index: number) {
+  trackByGrid(index: number): number {
     return index;
   }
 
@@ -124,10 +124,12 @@ export class GridBoardComponent implements OnInit, OnDestroy {
     this.key = ArrowKeys.ArrowLeft;
     this.setUpSnake();
     this.setUpFood();
-    this.createInterval();
+    this.animationFrame = window.requestAnimationFrame(() =>
+      this.createInterval()
+    );
   }
 
-  private setUpFood() {
+  private setUpFood(): void {
     this.boardData[this.foodPosition] = CellType.Free;
     this.foodPosition = 780;
     this.boardData[this.foodPosition] = CellType.Food;
@@ -181,8 +183,7 @@ export class GridBoardComponent implements OnInit, OnDestroy {
 
   private getNewSnakeHeadPosition(): number {
     let newHeadPosition = this.snakeBody[0];
-    const firstKey: ArrowKeys =
-      this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
+    const firstKey = this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
 
     switch (firstKey) {
       case ArrowKeys.ArrowUp:
