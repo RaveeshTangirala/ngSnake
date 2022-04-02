@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	OnInit,
+} from '@angular/core';
 
 @Component({
 	selector: 'app-root',
@@ -6,6 +11,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 	styleUrls: ['./app.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
-	title = 'snake';
+export class AppComponent implements OnInit {
+	constructor(private _ref: ChangeDetectorRef) {}
+
+	ngOnInit(): void {
+		this._ref.detectChanges();
+	}
 }

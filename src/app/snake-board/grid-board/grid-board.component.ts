@@ -1,231 +1,236 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  HostListener,
-  OnDestroy,
-  OnInit,
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	HostListener,
+	OnDestroy,
+	OnInit,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ArrowKeys } from '../enums/arrow-keys';
 import { CellType } from '../enums/cell-types';
-import { WallsDataService } from '../services/walls-data.service';
+import { BoardDataService } from '../services/board-data.service';
 
 @Component({
-  selector: 'grid-board',
-  templateUrl: './grid-board.component.html',
-  styleUrls: ['./grid-board.component.scss'],
-  host: {
-    '(document:keypress)': 'handleKeyboardEvent($event)',
-  },
-  changeDetection: ChangeDetectionStrategy.OnPush,
+	selector: 'grid-board',
+	templateUrl: './grid-board.component.html',
+	styleUrls: ['./grid-board.component.scss'],
+	host: {
+		'(document:keypress)': 'handleKeyboardEvent($event)',
+	},
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridBoardComponent implements OnInit, OnDestroy {
-  score: number = 0;
-  isGameOver: boolean;
+	score: number = 0;
+	isGameOver: boolean;
 
-  boardData: Array<CellType> = this.wallsService.boardData;
-  level: string = this.route.snapshot.paramMap.get('id')!;
+	boardData: CellType[];
+	private _boardDataSubscription: Subscription;
 
-  readonly boardWidth: number = 40;
-  private readonly boardHeight: number = 30;
-  private readonly boardMaxCells: number = this.boardWidth * this.boardHeight;
+	readonly boardWidth: number = 40;
+	private readonly _boardHeight: number = 30;
+	private readonly _boardMaxCells: number = this.boardWidth * this._boardHeight;
 
-  private key: ArrowKeys = ArrowKeys.ArrowLeft;
-  private keyBuffer: Array<ArrowKeys> = new Array<ArrowKeys>();
-  private snakeBody: Array<number> = new Array<number>();
+	private _key: ArrowKeys = ArrowKeys.ArrowLeft;
+	private _keyBuffer: ArrowKeys[] = [];
+	private _snakeBody: number[] = [];
 
-  private snakeSpeed: number = 250;
-  private foodPosition: number = 780;
-  private freeBlocks: Array<number> = [];
-  private startTime: number;
-  private animationFrame: number;
+	private _snakeSpeed: number = 250;
+	private _foodPosition: number = 780;
+	private _freeBlocks: number[] = [];
+	private _startTime: number;
+	private _animationFrame: number;
 
-  constructor(
-    private route: ActivatedRoute,
-    private wallsService: WallsDataService,
-    private ref: ChangeDetectorRef
-  ) {
-    this.setUpSnake();
-  }
+	constructor(
+		private _boardDataService: BoardDataService,
+		private _ref: ChangeDetectorRef
+	) {}
 
-  ngOnInit(): void {
-    this.startTime = Date.now();
-    this.animationFrame = window.requestAnimationFrame(() =>
-      this.createInterval()
-    );
-  }
+	ngOnInit(): void {
+		this._boardDataSubscription = this._boardDataService.boardData$.subscribe(
+			(boardData: CellType[]) => {
+				this.boardData = boardData.slice(0); // creates a copy
+				this.startGame();
+			}
+		);
+	}
 
-  ngOnDestroy(): void {
-    window.cancelAnimationFrame(this.animationFrame);
-  }
+	ngOnDestroy(): void {
+		window.cancelAnimationFrame(this._animationFrame);
+		this._boardDataSubscription.unsubscribe();
+	}
 
-  getCellColour(cellType: CellType, index: number): string {
-    switch (cellType) {
-      case CellType.Free:
-        this.freeBlocks.push(index);
-        return 'black';
-      case CellType.Wall:
-        return 'white';
-      case CellType.Body:
-        return 'green';
-      case CellType.Food:
-        return 'red';
-      default:
-        return '';
-    }
-  }
+	getCellColour(cellType: CellType, index: number): string {
+		switch (cellType) {
+			case CellType.Free:
+				this._freeBlocks.push(index);
+				return 'black';
+			case CellType.Wall:
+				return 'white';
+			case CellType.Body:
+				return 'green';
+			case CellType.Food:
+				return 'red';
+			default:
+				return '';
+		}
+	}
 
-  trackByGrid(index: number): number {
-    return index;
-  }
+	trackByGrid(index: number): number {
+		return index;
+	}
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (this.keyBuffer.length === 2) {
-      return;
-    }
+	@HostListener('document:keydown', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent): void {
+		if (this._keyBuffer.length === 2) {
+			return;
+		}
 
-    switch (event.key) {
-      case 'ArrowUp':
-        if (this.key === ArrowKeys.ArrowDown) return;
-        this.key = ArrowKeys.ArrowUp;
-        this.keyBuffer.push(ArrowKeys.ArrowUp);
-        break;
-      case 'ArrowDown':
-        if (this.key === ArrowKeys.ArrowUp) return;
-        this.key = ArrowKeys.ArrowDown;
-        this.keyBuffer.push(ArrowKeys.ArrowDown);
-        break;
-      case 'ArrowLeft':
-        if (this.key === ArrowKeys.ArrowRight) return;
-        this.key = ArrowKeys.ArrowLeft;
-        this.keyBuffer.push(ArrowKeys.ArrowLeft);
-        break;
-      case 'ArrowRight':
-        if (this.key === ArrowKeys.ArrowLeft) return;
-        this.key = ArrowKeys.ArrowRight;
-        this.keyBuffer.push(ArrowKeys.ArrowRight);
-        break;
-    }
-  }
+		switch (event.key) {
+			case 'ArrowUp':
+				if (this._key === ArrowKeys.ArrowDown) return;
+				this._key = ArrowKeys.ArrowUp;
+				this._keyBuffer.push(ArrowKeys.ArrowUp);
+				break;
+			case 'ArrowDown':
+				if (this._key === ArrowKeys.ArrowUp) return;
+				this._key = ArrowKeys.ArrowDown;
+				this._keyBuffer.push(ArrowKeys.ArrowDown);
+				break;
+			case 'ArrowLeft':
+				if (this._key === ArrowKeys.ArrowRight) return;
+				this._key = ArrowKeys.ArrowLeft;
+				this._keyBuffer.push(ArrowKeys.ArrowLeft);
+				break;
+			case 'ArrowRight':
+				if (this._key === ArrowKeys.ArrowLeft) return;
+				this._key = ArrowKeys.ArrowRight;
+				this._keyBuffer.push(ArrowKeys.ArrowRight);
+				break;
+		}
+	}
 
-  gameOver(): void {
-    this.isGameOver = true;
-    this.keyBuffer = [];
-    window.cancelAnimationFrame(this.animationFrame);
-  }
+	gameOver(): void {
+		this.isGameOver = true;
+		this._keyBuffer = [];
+		window.cancelAnimationFrame(this._animationFrame);
+	}
 
-  playAgain(): void {
-    this.isGameOver = false;
-    this.snakeSpeed = 250;
-    this.score = 0;
-    this.keyBuffer = [];
-    this.key = ArrowKeys.ArrowLeft;
-    this.setUpSnake();
-    this.setUpFood();
-    this.animationFrame = window.requestAnimationFrame(() =>
-      this.createInterval()
-    );
-  }
+	startGame(): void {
+		this.score = 0;
+		this.isGameOver = false;
+		this._snakeSpeed = 250;
+		this._keyBuffer = [];
+		this._key = ArrowKeys.ArrowLeft;
+		this.setUpSnake();
+		this.setUpFood();
 
-  private setUpFood(): void {
-    this.boardData[this.foodPosition] = CellType.Free;
-    this.foodPosition = 780;
-    this.boardData[this.foodPosition] = CellType.Food;
-  }
+		this._startTime = Date.now();
+		this._animationFrame = window.requestAnimationFrame(() =>
+			this.createInterval()
+		);
+	}
 
-  private setUpSnake(): void {
-    for (let position of this.snakeBody) {
-      this.boardData[position] = CellType.Free;
-    }
-    this.snakeBody = [825, 826, 827];
-    for (let position of this.snakeBody) {
-      this.boardData[position] = CellType.Body;
-    }
-  }
+	private setUpFood(): void {
+		this.boardData[this._foodPosition] = CellType.Free;
+		this._foodPosition = 780;
+		this.boardData[this._foodPosition] = CellType.Food;
+	}
 
-  private createInterval(): void {
-    if (Date.now() - this.startTime >= this.snakeSpeed) {
-      this.updateFoodPosition();
-      const newHeadPosition = this.getNewSnakeHeadPosition();
-      this.handleSnakeCollision(newHeadPosition);
-      this.moveSnakeBody(newHeadPosition);
-      this.updateDataWhenFoodIsConsumed();
-      this.keyBuffer = [];
-      this.freeBlocks = [];
-      this.ref.markForCheck();
-      this.startTime = Date.now();
-    }
+	private setUpSnake(): void {
+		for (let position of this._snakeBody) {
+			if (this.boardData[position] === CellType.Body) {
+				this.boardData[position] = CellType.Free;
+			}
+		}
+		this._snakeBody = [825, 826, 827];
+		for (let position of this._snakeBody) {
+			this.boardData[position] = CellType.Body;
+		}
+	}
 
-    this.animationFrame = window.requestAnimationFrame(() =>
-      this.createInterval()
-    );
-  }
+	private createInterval(): void {
+		if (!this.isGameOver && Date.now() - this._startTime >= this._snakeSpeed) {
+			this.updateFoodPosition();
+			const newHeadPosition = this.getNewSnakeHeadPosition();
+			this.handleSnakeCollision(newHeadPosition);
+			this.moveSnakeBody(newHeadPosition);
+			this.updateDataWhenFoodIsConsumed();
+			this._keyBuffer = [];
+			this._freeBlocks = [];
+			this._ref.detectChanges();
+			this._startTime = Date.now();
+		}
 
-  private updateDataWhenFoodIsConsumed(): void {
-    if (this.snakeBody[0] === this.foodPosition) {
-      this.snakeBody.push(this.foodPosition);
-      this.snakeSpeed *= this.snakeSpeed > 50 ? 0.8 : 1;
-      this.foodPosition = -1;
-      this.score++;
-    }
-  }
+		this._animationFrame = window.requestAnimationFrame(() =>
+			this.createInterval()
+		);
+	}
 
-  private handleSnakeCollision(newHeadPosition: number): void {
-    switch (this.boardData[newHeadPosition]) {
-      case CellType.Body:
-      case CellType.Wall:
-        this.gameOver();
-        break;
-    }
-  }
+	private updateDataWhenFoodIsConsumed(): void {
+		if (this._snakeBody[0] === this._foodPosition) {
+			this._snakeBody.push(this._foodPosition);
+			this._snakeSpeed *= this._snakeSpeed > 50 ? 0.8 : 1;
+			this._foodPosition = -1;
+			this.score++;
+		}
+	}
 
-  private getNewSnakeHeadPosition(): number {
-    let newHeadPosition = this.snakeBody[0];
-    const firstKey = this.keyBuffer.length > 0 ? this.keyBuffer[0] : this.key;
+	private handleSnakeCollision(newHeadPosition: number): void {
+		switch (this.boardData[newHeadPosition]) {
+			case CellType.Body:
+			case CellType.Wall:
+				this.gameOver();
+				break;
+		}
+	}
 
-    switch (firstKey) {
-      case ArrowKeys.ArrowUp:
-        newHeadPosition -= this.boardWidth;
-        if (newHeadPosition < 0) newHeadPosition += this.boardMaxCells;
-        break;
-      case ArrowKeys.ArrowDown:
-        newHeadPosition += this.boardWidth;
-        if (newHeadPosition > this.boardMaxCells - 1)
-          newHeadPosition -= this.boardMaxCells;
-        break;
-      case ArrowKeys.ArrowLeft:
-        newHeadPosition -= 1;
-        if ((newHeadPosition + 1) % this.boardWidth === 0)
-          newHeadPosition += this.boardWidth;
-        break;
-      case ArrowKeys.ArrowRight:
-        newHeadPosition += 1;
-        if (newHeadPosition % this.boardWidth === 0)
-          newHeadPosition -= this.boardWidth;
-        break;
-    }
+	private getNewSnakeHeadPosition(): number {
+		let newHeadPosition = this._snakeBody[0];
+		const firstKey =
+			this._keyBuffer.length > 0 ? this._keyBuffer[0] : this._key;
 
-    return newHeadPosition;
-  }
+		switch (firstKey) {
+			case ArrowKeys.ArrowUp:
+				newHeadPosition -= this.boardWidth;
+				if (newHeadPosition < 0) newHeadPosition += this._boardMaxCells;
+				break;
+			case ArrowKeys.ArrowDown:
+				newHeadPosition += this.boardWidth;
+				if (newHeadPosition > this._boardMaxCells - 1)
+					newHeadPosition -= this._boardMaxCells;
+				break;
+			case ArrowKeys.ArrowLeft:
+				newHeadPosition -= 1;
+				if ((newHeadPosition + 1) % this.boardWidth === 0)
+					newHeadPosition += this.boardWidth;
+				break;
+			case ArrowKeys.ArrowRight:
+				newHeadPosition += 1;
+				if (newHeadPosition % this.boardWidth === 0)
+					newHeadPosition -= this.boardWidth;
+				break;
+		}
 
-  private moveSnakeBody(newHeadPosition: number): void {
-    if (!this.isGameOver) {
-      this.boardData[this.snakeBody.pop()!] = CellType.Free;
-      this.snakeBody.unshift(newHeadPosition);
+		return newHeadPosition;
+	}
 
-      for (let i = 0; i < this.snakeBody.length; i++) {
-        this.boardData[this.snakeBody[i]] = CellType.Body;
-      }
-    }
-  }
+	private moveSnakeBody(newHeadPosition: number): void {
+		if (!this.isGameOver) {
+			this.boardData[this._snakeBody.pop()!] = CellType.Free;
+			this._snakeBody.unshift(newHeadPosition);
 
-  private updateFoodPosition(): void {
-    if (this.foodPosition < 0) {
-      this.foodPosition =
-        this.freeBlocks[Math.floor(Math.random() * this.freeBlocks.length)];
-      this.boardData[this.foodPosition] = CellType.Food;
-    }
-  }
+			for (let i = 0; i < this._snakeBody.length; i++) {
+				this.boardData[this._snakeBody[i]] = CellType.Body;
+			}
+		}
+	}
+
+	private updateFoodPosition(): void {
+		if (this._foodPosition < 0) {
+			this._foodPosition =
+				this._freeBlocks[Math.floor(Math.random() * this._freeBlocks.length)];
+			this.boardData[this._foodPosition] = CellType.Food;
+		}
+	}
 }

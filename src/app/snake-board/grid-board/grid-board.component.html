@@ -1,16 +1,13 @@
 <div class="col-8">
   <div class="row">
     <div class="col-8">
+      <level-selector></level-selector>
       <ng-container *ngIf="!isGameOver; else gameOver">
-        <h3>Selected level: {{ level }}</h3>
-        <p>
-          Score: {{ score }}
-          <play-again-button
-            buttonText="Restart"
-            (buttonClickEvent)="playAgain()"
-          ></play-again-button>
-        </p>
-        <choose-level></choose-level>
+        <play-again-button
+          buttonText="Restart"
+          (buttonClickEvent)="startGame()"
+        ></play-again-button>
+        <p>Score: {{ score }}</p>
       </ng-container>
     </div>
   </div>
@@ -25,7 +22,6 @@
 <ng-template #gameOver>
   <p>
     Game over! Your score is {{ score }}!
-    <play-again-button (buttonClickEvent)="playAgain()"></play-again-button>
+    <play-again-button (buttonClickEvent)="startGame()"></play-again-button>
   </p>
-  <choose-level></choose-level>
 </ng-template>
