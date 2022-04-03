@@ -1,1 +1,1 @@
-ng build --baseHref="/ngSnake/" && copy .\docs\index.html .\docs\404.html
+(ng build --configuration production --baseHref="/ngSnake/") -and (copy .\docs\index.html .\docs\404.html)
