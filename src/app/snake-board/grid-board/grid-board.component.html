@@ -5,7 +5,7 @@
       <ng-container *ngIf="!isGameOver; else gameOver">
         <play-again-button
           buttonText="Restart"
-          (buttonClickEvent)="startGame()"
+          (click)="startGame()"
         ></play-again-button>
         <p>Score: {{ score }}</p>
       </ng-container>
@@ -22,6 +22,6 @@
 <ng-template #gameOver>
   <p>
     Game over! Your score is {{ score }}!
-    <play-again-button (buttonClickEvent)="startGame()"></play-again-button>
+    <play-again-button (click)="startGame()"></play-again-button>
   </p>
 </ng-template>

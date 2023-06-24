@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunksnake=self.webpackChunksnake||[]).push([[429],{344:()=>{}},e=>{e(e.s=344)}]);
